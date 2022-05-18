@@ -1,13 +1,9 @@
 import './App.css';
-import SearchBox from './Container/SearchBox/SearchBox';
-import DataBox from './Container/DataBox/DataBox';
+import Home from './Container/Home/Home';
 
 function App() {
   return (
-    <div className="App">
-      <SearchBox />
-      <DataBox/>
-    </div>
+    <Home />
   );
 }
 

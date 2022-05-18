@@ -1,0 +1,29 @@
+.listItem {
+	width: 100%;
+	margin: 5px 0px;
+	height: 50px;
+	overflow: hidden;
+	white-space: nowrap;
+	cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+	border: 2px solid purple;
+	border-radius: 15px;
+	font-weight: bold;
+}
+
+.listItem:hover {
+	background: #b45fb4;
+}
+
+.itemText {
+	width: 80%;
+	white-space:initial;
+	overflow: hidden;
+	margin: 0 10px;
+}
+
+.itemFav {
+	width: 10%;
+}
