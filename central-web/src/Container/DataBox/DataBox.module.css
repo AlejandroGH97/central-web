@@ -1,0 +1,22 @@
+.dataBox {
+  width: 60%;
+  min-width: 400px;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+  border: 2px solid #800080;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+@media screen and (max-width: 800px) {
+  .dataBox {
+    width: 90%;
+  }
+}
+
+.star {
+  fill: #ffd700;
+  stroke: #ffd700;
+}

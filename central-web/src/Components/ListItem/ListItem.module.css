@@ -1,29 +1,55 @@
 .listItem {
-	width: 100%;
-	margin: 5px 0px;
-	height: 50px;
-	overflow: hidden;
-	white-space: nowrap;
-	cursor: pointer;
+  width: 100%;
+  margin: 5px 0px;
+  height: 50px;
+  overflow: hidden;
+  white-space: nowrap;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-	border: 2px solid purple;
-	border-radius: 15px;
-	font-weight: bold;
+  background-color: #ffffff;
+  border: 2px solid #800080;
+  border-radius: 15px;
+  font-weight: bold;
 }
 
 .listItem:hover {
-	background: #b45fb4;
+  background-color: #e899e8;
 }
 
 .itemText {
-	width: 80%;
-	white-space:initial;
-	overflow: hidden;
-	margin: 0 10px;
+  width: 80%;
+  white-space: initial;
+  overflow: hidden;
+  margin: 0 10px;
 }
 
 .itemFav {
-	width: 10%;
+  width: 10%;
+}
+
+.selected {
+  background-color: #800080;
+  color: white;
+}
+
+.selected:hover {
+  background-color: #800080;
+  color: white;
+}
+
+.star {
+  fill: #ffffff;
+  stroke: #000000;
+}
+
+.star:hover {
+  fill: #fff09d;
+  stroke: #fff09d;
+}
+
+.starFavorite {
+  fill: #ffd700;
+  stroke: #ffd700;
 }
