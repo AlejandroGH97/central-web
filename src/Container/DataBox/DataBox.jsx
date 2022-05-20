@@ -5,7 +5,7 @@ const DataBox = (props) => {
   return (
     <div className={styles.dataBox}>
       <h1>
-        {props.cause.cause}{" "}
+        {props.cause.name}{" "}
         {props.cause.isFavorite && (
           <Star height={30} width={30} class={styles.star} />
         )}

@@ -3,10 +3,22 @@ import SearchBar from "../../Components/SearchBar/SearchBar";
 import SearchList from "../../Components/SearchList/SearchList";
 import { useState } from "react";
 
+/*
+ * Contenedor que se encarga de mostrar la lista de causas, seleccionar causa que se quiere visualizar y manejar los favoritos
+ */
 const SearchBox = (props) => {
-  const [causeFilter, setcauseFilter] = useState("");
+  /*
+   * State
+   */
+
+  // String para filtrar las causas
+  const [causeFilter, setCauseFilter] = useState("");
+
+  // Nombre del tab activo (Causas o Fav) para ver que lista mostrar
   const [activeTab, setActiveTab] = useState("Causas");
-  let selectedList = props.causeList;
+
+  // Variable que almacena las causas a mostrar en base a activeTab
+  let selectedList = [];
 
   if (activeTab === "Causas") {
     selectedList = props.causeList;
@@ -17,14 +29,21 @@ const SearchBox = (props) => {
     selectedList = filteredList;
   }
 
+  /*
+   * Handlers
+   */
+
+  // Función que cambia el filtro cuando se escribe algo en SearchBar
   const causeFilterChangeHandler = (event) => {
-    setcauseFilter(event.target.value);
+    setCauseFilter(event.target.value);
   };
 
+  // Función para cambiar al tab Causas
   const toggleCausas = () => {
     setActiveTab("Causas");
   };
 
+  // Función para cambiar al tab Favoritos
   const toggleFav = () => {
     setActiveTab("Fav");
   };
@@ -54,7 +73,7 @@ const SearchBox = (props) => {
         selectedCause={props.selectedCause}
         causeList={selectedList}
         causeFilter={causeFilter}
-        causeChange={props.causeChange}
+        selectedCauseChange={props.selectedCauseChange}
         favCauseHandler={props.favCauseHandler}
       />
     </div>

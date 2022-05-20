@@ -2,13 +2,26 @@ import { useEffect, useState } from "react";
 import ListItem from "../ListItem/ListItem";
 import styles from "./SearchList.module.css";
 
+/*
+ * Componente encargado de mostrar la lista de causas.
+ */
 const SearchList = (props) => {
+  /*
+   * State
+   */
+
+  // Almacena la lista para mostrar
   const [filteredList, setFilteredList] = useState(props.causeList);
 
+  /*
+   * Use Effect
+   */
+
+  // Crea la nueva lista filtrada cuando cambia la lista original o el filtro de la búsqueda
   useEffect(() => {
     const newList = props.causeList.filter((cause) => {
       return (
-        cause.cause.toLowerCase().search(props.causeFilter.toLowerCase()) !== -1
+        cause.name.toLowerCase().search(props.causeFilter.toLowerCase()) !== -1
       );
     });
 
@@ -20,10 +33,10 @@ const SearchList = (props) => {
       {filteredList.map((cause, index) => {
         return (
           <ListItem
-            key={cause.cause}
+            key={cause.name}
             cause={cause}
-            causeChange={props.causeChange}
-            isSelected={cause.cause === props.selectedCause.cause}
+            selectedCauseChange={props.selectedCauseChange}
+            isSelected={cause.name === props.selectedCause.name}
             favCauseHandler={props.favCauseHandler}
           />
         );

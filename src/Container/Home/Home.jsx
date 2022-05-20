@@ -1,72 +1,145 @@
+import { useEffect, useState } from "react";
 import SearchBox from "../../Container/SearchBox/SearchBox";
 import DataBox from "../../Container/DataBox/DataBox";
+import httpClient from "../../lib/httpClient";
 
 import styles from "./Home.module.css";
-import { useEffect, useState } from "react";
 
-let causesMock = [
-  { cause: "All Cause" },
-  { cause: "Natural Cause" },
-  { cause: "Septicemia" },
-  { cause: "Malignant Neoplasms" },
-  { cause: "Diabetes Mellitus" },
-  { cause: "Alzheimer Disease" },
-  { cause: "Influenza and Pneumonia" },
-  { cause: "Chronic Lower Respiratory Diseases" },
-  { cause: "Other Diseases of Respiratory System" },
-  { cause: "Nephritis, Nephrotic Syndrome, and Nephrosis" },
-  { cause: "Others Not Listed" },
-  { cause: "Diseases of Heart" },
-  { cause: "Cerebrovascular Diseases" },
-  { cause: "Accidents (Unintentional Injuries)" },
-  { cause: "Motor Vehicle Accidents" },
-  { cause: "Intentional Self-Harm (Suicide)" },
-  { cause: "Assault (Homicide)" },
-  { cause: "Drug Overdose" },
-];
-
+/*
+ * Contenedor base de la aplicación. Se encarga de manejar los datos y distribuirlos a los dos contenedores hijos (SearchBox y DataBox).
+ */
 const Home = () => {
+  /*
+   * State
+   */
+
+  // Causa seleccionada para ser visualizada
   const [selectedCause, setSelectedCause] = useState({});
+
+  // Lista con el nombre de las causas
   const [causeList, setCauseList] = useState([]);
 
+  const [selectedCauseData, setSelectedCauseData] = useState([]);
+
+  /*
+   * useEffect
+   */
+
+  // Pedimos la lista de causas al back cuando se renderiza Home
   useEffect(() => {
-    // TODO: Pedir data al back
-    let savedFavorites = JSON.parse(localStorage.getItem("favoriteCauses")) || [];
-    const causes = causesMock.map((cause) => {
-      const isFav = savedFavorites.findIndex((fav) => {
-        return fav === cause.cause;
-      });
-      return { ...cause, isFavorite: isFav !== -1 };
-    });
-    setCauseList(() => {
-      return causes;
-    });
-    setSelectedCause(causes[0]);
+    getCauseList();
   }, []);
 
+  // Pedimos los datos de la causa seleccionada cuando cambia la causa seleccionada
+  useEffect(() => {
+    const getSelectedCauseData = async () => {
+      // Si hay una causa valida seleccionada traemos la informacion
+      if (selectedCause.hasOwnProperty("id")) {
+        try {
+          // Pedimos la lista de causas a la ruta /causas/:id
+          const causeData = await httpClient.get(`/causas/${selectedCause.id}`);
+          // Ordenamos los datos por fecha si se
+          causeData.sort((data1, data2) => {
+            if (Date.parse(data1.date) < Date.parse(data2.date)) return -1;
+            if (Date.parse(data1.date) > Date.parse(data2.date)) return 1;
+            return 0;
+          });
+
+          setSelectedCauseData(causeData);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    getSelectedCauseData();
+  }, [selectedCause]);
+
+  /*
+   * Conexiones al servidor
+   */
+
+  /*
+   * Función que pide la lista de los nombres de causas de muertes al servidor para ser utilizada en SearchList
+   * Selecciona la primera causa para mostrar su información
+   */
+  const getCauseList = async () => {
+    try {
+      // Pedimos la lista de causas a la ruta /causas
+      const causeData = await httpClient.get("/causas");
+
+      // Cargamos la lista de favoritos guardada localmente
+      let savedFavorites =
+        JSON.parse(localStorage.getItem("favoriteCauses")) || [];
+
+      // Como la base de datos no almacena favoritos, le agragamos la propiedad a todas las causas
+      let causes = causeData.map((cause) => {
+        const isFav = savedFavorites.findIndex((fav) => {
+          return fav === cause.name;
+        });
+        return { id: cause.id, name: cause.name, isFavorite: isFav !== -1 };
+      });
+
+      // Ordenamos la lista de causas por id
+      causes.sort((c1, c2) => {
+        if (c1.id < c2.id) return -1;
+        if (c1.id > c2.id) return 1;
+        return 0;
+      });
+
+      // Guardamos la lista ya procesada
+      setCauseList(() => {
+        return causes;
+      });
+
+      // Seleccionamos la primera causa para que se muestre información en DataBox
+      setSelectedCause(causes[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /*
+   * Handlers
+   */
+
+  /*
+   * Función que se llama cuando se selecciona una nueva causa
+   */
   const selectedCauseChangeHandler = (newCause) => {
     setSelectedCause(newCause);
   };
 
+  /*
+   * Función que se llama cuando se hace click al ícono de favorito
+   * Si era la causa seleccionada, cambia el valor de isFavorite ahi también
+   */
   const favoriteCauseHandler = (favCause) => {
+    // Seteamos la lista nuevamente pero negamos el valor de favorito para la causa seleccionada (favCause)
     setCauseList((prevList) => {
       const newList = prevList.map((cause) => {
-        if (cause.cause === favCause.cause) {
-          return { cause: cause.cause, isFavorite: !cause.isFavorite };
+        if (cause.name === favCause.name) {
+          return { name: cause.name, isFavorite: !cause.isFavorite };
         }
         return cause;
       });
+
+      // Actualizamos la lista de favoritos guardada localmente
       localStorage.setItem(
         "favoriteCauses",
-        JSON.stringify(newList.filter((cause) => cause.isFavorite === true).map((cause) => cause.cause))
+        JSON.stringify(
+          newList
+            .filter((cause) => cause.isFavorite === true)
+            .map((cause) => cause.name)
+        )
       );
       return newList;
     });
 
-    if (favCause.cause === selectedCause.cause) {
+    // Actualizamos la causa seleccionada en caso que sea la que se modificó
+    if (favCause.name === selectedCause.name) {
       setSelectedCause((prevSelected) => {
         const newSelected = {
-          ...prevSelected,
+          name: prevSelected.name,
           isFavorite: !prevSelected.isFavorite,
         };
         return newSelected;
@@ -77,12 +150,12 @@ const Home = () => {
   return (
     <div className={styles.home}>
       <SearchBox
-        causeChange={selectedCauseChangeHandler}
+        selectedCauseChange={selectedCauseChangeHandler}
         causeList={causeList}
         favCauseHandler={favoriteCauseHandler}
         selectedCause={selectedCause}
       />
-      <DataBox cause={selectedCause} />
+      <DataBox cause={selectedCause} causeData={selectedCauseData} />
     </div>
   );
 };
