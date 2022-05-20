@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
 import Star from "../../Assets/Icons/Star";
 import {
-  FlexibleXYPlot,
+  FlexibleWidthXYPlot,
   XAxis,
   YAxis,
   VerticalGridLines,
   HorizontalGridLines,
-  LineSeries,
+  LineMarkSeries,
+  Hint,
 } from "react-vis";
 import httpClient from "../../lib/httpClient";
 
 import "react-vis/dist/style.css";
 import styles from "./DataBox.module.css";
+import DataTable from "../../Components/DataTable/DataTable";
 
 const DataBox = (props) => {
+  // Variable helper para datos del gráfco
   const MESES = [
     "Enero",
     "Febrero",
@@ -28,15 +31,25 @@ const DataBox = (props) => {
     "Noviembre",
     "Diciembre",
   ];
+
+  // Estado que almacena el año para filtrar los datos
   const [yearFilter, setYearFilter] = useState();
+
+  // Estado que almacena los datos completos de la causa seleccionada
   const [causeData, setCauseData] = useState([]);
+
+  // Estado que almacena los datos filtrados por yearFilter para ser mostrados en el gráfico
   const [filteredCauseData, setFilteredCauseData] = useState([]);
+
+  // Estado que almacena lista de los años con los que se cuenta datos
   const [yearsList, setYearsList] = useState([]);
 
+  // Función que pide datos al servidor cuando cambia la causa seleccionada
   useEffect(() => {
     getSelectedCauseData();
   }, [props.cause.name]);
 
+  // Función que actualiza los datos filtrados cuando se piden datos nuevos o cambia el año de filtro
   useEffect(() => {
     filterCauseData();
   }, [causeData, yearFilter]);
@@ -55,8 +68,10 @@ const DataBox = (props) => {
           return 0;
         });
 
+        // Actualizamos los datos
         setCauseData(data);
 
+        // Actualizamos la lista de años ya que pueden ser diferentes
         const years = [];
         for (let index = 0; index < data.length; index++) {
           if (
@@ -74,6 +89,11 @@ const DataBox = (props) => {
     }
   };
 
+  /*
+   * Helper functions
+   */
+
+  // Función que filtra los datos en base al año seleccionado y los pone en el formato correcto para el gráfico
   const filterCauseData = () => {
     let filteredData = causeData
       .filter((cause) => {
@@ -88,6 +108,11 @@ const DataBox = (props) => {
     setFilteredCauseData(filteredData);
   };
 
+  /*
+   * Handlers
+   */
+
+  // Actualiza el año para filtrar los datos
   const handleYearFilterChange = (event) => {
     setYearFilter(event.target.value);
   };
@@ -113,18 +138,18 @@ const DataBox = (props) => {
           );
         })}
       </select>
-      <FlexibleXYPlot
+      <FlexibleWidthXYPlot
+        height={400}
         margin={{ left: 70, right: 30 }}
         animation={true}
         style={{
           borderRadius: "10px",
           border: "2px solid #0000ff",
           boxShadow: "4px 4px 10px #000000bb",
-          padding: "10px"
         }}
       >
-        <VerticalGridLines style={{stroke: "#989898"}}/>
-        <HorizontalGridLines style={{stroke: "#989898"}}/>
+        <VerticalGridLines />
+        <HorizontalGridLines />
         <XAxis
           type={"ordinal"}
           tickTotal={12}
@@ -146,14 +171,15 @@ const DataBox = (props) => {
             },
           }}
         />
-        <LineSeries
+        <LineMarkSeries
           data={filteredCauseData}
           curve={"curveMonotoneX"}
           strokeWidth={3}
           stroke={"#0000ff"}
+          fill={"#c5ddfe"}
         />
-      </FlexibleXYPlot>
-      
+      </FlexibleWidthXYPlot>
+      <DataTable causeData={filteredCauseData} MESES={MESES}/>
     </div>
   );
 };

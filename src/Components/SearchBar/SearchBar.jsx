@@ -1,5 +1,7 @@
 import styles from "./SearchBar.module.css";
-
+/*
+ * Barra de búsqueda con función que se ejecuta cuando cambia el texto
+ */
 const SearchBar = (props) => {
   return (
     <>
