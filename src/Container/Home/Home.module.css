@@ -1,12 +1,17 @@
-.home {
-  height: 100vh;
+.homeTitle {
+  text-align: center;
+  margin: 30px;
+}
+
+.homeContent {
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 @media (max-width: 800px) {
-  .home {
+  .homeContent {
     flex-direction: column;
   }
 }

@@ -19,7 +19,7 @@ const Home = () => {
   // Lista con el nombre de las causas
   const [causeList, setCauseList] = useState([]);
 
-  const [selectedCauseData, setSelectedCauseData] = useState([]);
+  // const [selectedCauseData, setSelectedCauseData] = useState([]);
 
   /*
    * useEffect
@@ -29,30 +29,6 @@ const Home = () => {
   useEffect(() => {
     getCauseList();
   }, []);
-
-  // Pedimos los datos de la causa seleccionada cuando cambia la causa seleccionada
-  useEffect(() => {
-    const getSelectedCauseData = async () => {
-      // Si hay una causa valida seleccionada traemos la informacion
-      if (selectedCause.hasOwnProperty("id")) {
-        try {
-          // Pedimos la lista de causas a la ruta /causas/:id
-          const causeData = await httpClient.get(`/causas/${selectedCause.id}`);
-          // Ordenamos los datos por fecha si se
-          causeData.sort((data1, data2) => {
-            if (Date.parse(data1.date) < Date.parse(data2.date)) return -1;
-            if (Date.parse(data1.date) > Date.parse(data2.date)) return 1;
-            return 0;
-          });
-
-          setSelectedCauseData(causeData);
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    };
-    getSelectedCauseData();
-  }, [selectedCause]);
 
   /*
    * Conexiones al servidor
@@ -79,10 +55,10 @@ const Home = () => {
         return { id: cause.id, name: cause.name, isFavorite: isFav !== -1 };
       });
 
-      // Ordenamos la lista de causas por id
+      // Ordenamos la lista de causas por nombre
       causes.sort((c1, c2) => {
-        if (c1.id < c2.id) return -1;
-        if (c1.id > c2.id) return 1;
+        if (c1.name < c2.name) return -1;
+        if (c1.name > c2.name) return 1;
         return 0;
       });
 
@@ -118,7 +94,11 @@ const Home = () => {
     setCauseList((prevList) => {
       const newList = prevList.map((cause) => {
         if (cause.name === favCause.name) {
-          return { name: cause.name, isFavorite: !cause.isFavorite };
+          return {
+            id: cause.id,
+            name: cause.name,
+            isFavorite: !cause.isFavorite,
+          };
         }
         return cause;
       });
@@ -148,15 +128,20 @@ const Home = () => {
   };
 
   return (
-    <div className={styles.home}>
-      <SearchBox
-        selectedCauseChange={selectedCauseChangeHandler}
-        causeList={causeList}
-        favCauseHandler={favoriteCauseHandler}
-        selectedCause={selectedCause}
-      />
-      <DataBox cause={selectedCause} causeData={selectedCauseData} />
-    </div>
+    <>
+      <h1 className={styles.homeTitle}>
+        Causas de Muertes en Estados Unidos (2014-2019)
+      </h1>
+      <div className={styles.homeContent}>
+        <SearchBox
+          selectedCauseChange={selectedCauseChangeHandler}
+          causeList={causeList}
+          favCauseHandler={favoriteCauseHandler}
+          selectedCause={selectedCause}
+        />
+        <DataBox cause={selectedCause} />
+      </div>
+    </>
   );
 };
 

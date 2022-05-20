@@ -4,8 +4,8 @@ const Star = (props) => {
   return (
     <svg
       className={props.class}
-      onClick={(e) => {
-        e.stopPropagation();
+      onClick={(event) => {
+        event.stopPropagation();
         props.clicked();
       }}
       width={props.width}
